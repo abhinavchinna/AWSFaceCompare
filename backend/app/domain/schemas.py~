@@ -1,0 +1,23 @@
+from pydantic import BaseModel
+from typing import Optional, List
+
+class CompareFacesRequest(BaseModel):
+    image1: bytes
+    image2: bytes
+
+class FaceMatch(BaseModel):
+    similarity: float
+    face_id: str
+    bounding_box: dict
+    confidence: float
+
+class UnmatchedFace(BaseModel):
+    face_id: str
+    bounding_box: dict
+    confidence: float
+
+class CompareFacesResponse(BaseModel):
+    face_matches: Optional[List[FaceMatch]] = None
+    unmatched_faces: Optional[List[UnmatchedFace]] = None
+    source_image_face: Optional[dict] = None
+    target_image_face: Optional[dict] = None

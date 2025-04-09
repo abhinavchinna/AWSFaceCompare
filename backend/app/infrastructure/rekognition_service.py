@@ -1,0 +1,29 @@
+import boto3
+from core.config import settings
+
+class RekognitionService:
+    def __init__(self):
+        self.client = boto3.client(
+            'rekognition',
+            region_name=settings.AWS_REGION,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        )
+
+    def compare_faces(self, source_image: bytes, target_image: bytes, similarity_threshold: int = 80):
+        try:
+            response = self.client.compare_faces(
+                SourceImage={'Bytes': source_image},
+                TargetImage={'Bytes': target_image},
+                SimilarityThreshold=similarity_threshold
+            )
+            return response
+        except Exception as e:
+            print(f"Error comparing faces: {e}")
+            return None
+
+# Factory to create the RekognitionService (Factory Pattern)
+class RekognitionServiceFactory:
+    @staticmethod
+    def create():
+        return RekognitionService()

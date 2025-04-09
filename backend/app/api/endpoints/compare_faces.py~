@@ -1,0 +1,21 @@
+from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+from domain.schemas import CompareFacesResponse
+from app.services.face_comparison_service import FaceComparisonService
+
+router = APIRouter()
+
+@router.post("/compare", response_model=CompareFacesResponse)
+async def compare_uploaded_faces(
+    image1: UploadFile = File(...),
+    image2: UploadFile = File(...),
+    face_comparison_service: FaceComparisonService = Depends()
+):
+    if not image1.content_type.startswith("image/") or not image2.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Both files must be images.")
+
+    try:
+        image1_bytes = await image1.read()
+        image2_bytes = await image2.read()
+        return face_comparison_service.compare(image1_bytes, image2_bytes)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing images: {e}")
